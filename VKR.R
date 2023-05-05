@@ -477,31 +477,31 @@ stargazer(modelAU_Matching_1, modelAU_Matching_2, modelM_Matching,
 
 #                    проверяем баланс ковариатов для опроса
 
-#рассматриваем (Summary of Balance for All Data)
-#берем standardized mean difference (SMD) для всей выборки, мэтчинг здесь лишь для вызова функции саммари
-
+#рассчитываем стандартное отклонение (Standard Deviation (sd))
 
 DATA_B <- read_excel("C:/Users/Daria/Documents/VKR Balance.xlsx")
-#install.packages("MatchIt")
-library('MatchIt')
-matched_obj_b <- matchit( treatment ~    
-                            sex + 
-                            Eighteenplus +
-                            Twentyfiveplus +
-                            thirtyplus +
-                            fortyfiveplus +
-                            student +
-                            bachelor +
-                            works +
-                            hasexperience +
-                            doesntwork +
-                            rich +
-                            uppermiddleclass +
-                            middleclass +
-                            poor,
-                          data = DATA_B, replace = TRUE)
-summary(matched_obj_b)
 
+library('tableone')
+table1 <- CreateTableOne(vars=c('sex', 'Eighteenplus', 'Twentyfiveplus', 'thirtyplus', 'fortyfiveplus', 'bachelor', 'student',
+                                'doesntwork','works','hasexperience','rich','uppermiddleclass','middleclass','poor'), 
+                         strata = 'treatment', data=DATA_B, test=TRUE)
+table1
+
+#проверяем баланс, проводим Хи-квадрат тест (сводит к одной статистике)
+#install.packages("RItools")
+library('RItools')
+xBalance(treatment~  
+           sex + 
+           Eighteenplus +
+           Twentyfiveplus +
+           thirtyplus +
+           student +
+           works +
+           hasexperience +
+           rich +
+           uppermiddleclass +
+           middleclass, data=DATA_B, report = 'chisquare.test')
+#баланс есть, статистика <25
 
 #                       опрос часть 2
 
@@ -543,12 +543,3 @@ model_3 <- lm(agree ~
                   treatment,
                 data = DATA_B)
 summary(model_3)
-
-
-
-
-
-
-
-
-
